@@ -1,0 +1,61 @@
+using System;
+using System.Text;
+
+class PasswordGenerator
+{
+    static void Main()
+    {
+      
+        Console.Write("Enter First Name: ");
+        string firstName = Console.ReadLine().ToLower();   
+        
+        Console.Write("Enter Last Name: ");
+        string lastName = Console.ReadLine().ToLower();    
+        
+        Console.Write("Enter 3-digit Registration Number: ");
+        string regNo = Console.ReadLine();                
+        
+        Console.Write("Enter Favorite Food: ");
+        string favFood = Console.ReadLine();
+        
+        Console.Write("Enter Favorite Movie: ");
+        string favMovie = Console.ReadLine();
+
+     
+        string lowerChars = firstName + lastName;
+        string upperChars = lowerChars.ToUpper();
+        string specialChars = "!@#$%^&*()_+";
+        string digits = "0123456789";
+
+    
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+        
+       
+        password.Append(regNo);
+        
+      
+        password.Append(upperChars[random.Next(upperChars.Length)]);
+        
+       
+        password.Append(specialChars[random.Next(specialChars.Length)]);
+        password.Append(specialChars[random.Next(specialChars.Length)]);
+        
+     
+        for (int i = 0; i < 4; i++)
+        {
+            password.Append(lowerChars[random.Next(lowerChars.Length)]);
+        }
+        
+      
+        while (password.Length < 12)
+        {
+            string allChars = lowerChars + upperChars + specialChars + digits;
+            password.Append(allChars[random.Next(allChars.Length)]);
+        }
+        
+        // Finalize and Display the Password
+        string finalPassword = password.ToString().Substring(0, 12);
+        Console.WriteLine($"Generated Password: {finalPassword}");
+    }
+}
