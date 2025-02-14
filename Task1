@@ -1,0 +1,33 @@
+using System;
+using System.Text.RegularExpressions;
+
+class Program
+{
+    static void Main()
+    {
+        // Sample Registration Number
+        string registrationNumber = "31";
+        
+        // Sample Passwords to validate
+        string password1 = "31A@fajar!";
+        string password2 = "31a#Faj1";
+        string password3 = "31a@Fa@jar";
+        string password4 = "31Aa@fa!jar"; // This should be valid
+        
+        
+        string pattern = @"^31(?=.*[A-Z])(?=(.*[!@#$%^&*(),.?\""{}|<>]){2})(?=(.*[fajar]){4})[A-Za-z!@#$%^&*(),.?\""{}|<>]{10}$";
+
+       
+        Console.WriteLine($"Password 1: {password1} is valid: {CheckPassword(password1, pattern)}");
+        Console.WriteLine($"Password 2: {password2} is valid: {CheckPassword(password2, pattern)}");
+        Console.WriteLine($"Password 3: {password3} is valid: {CheckPassword(password3, pattern)}");
+        Console.WriteLine($"Password 4: {password4} is valid: {CheckPassword(password4, pattern)}");
+    }
+
+    
+    static bool CheckPassword(string password, string pattern)
+    {
+        Regex regex = new Regex(pattern);
+        return regex.IsMatch(password);
+    }
+}
