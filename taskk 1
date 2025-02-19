@@ -1,0 +1,33 @@
+using System;
+using System.Text.RegularExpressions;
+
+class Program
+{
+    static void Main()
+    {
+        Console.Write("Enter password: ");
+        string password = Console.ReadLine();
+
+        if (IsValidPassword(password))
+        {
+            Console.WriteLine("Password is valid.");
+        }
+        else
+        {
+            Console.WriteLine("Password is invalid.");
+        }
+    }
+
+    static bool IsValidPassword(string password)
+    {
+       
+        if (password.Length > 12)
+            return false;
+
+        
+        string pattern = @"^(?=.*[A-Z])(?=(?:[^a-z]*[fajar]){4,})(?=(?:[^!@#$%^&*()_+={}[\]:;<>,.?/-]*[!@#$%^&*()_+={}[\]:;<>,.?/-]){2,})\d{2}.{4,10}$";
+
+        return Regex.IsMatch(password, pattern);
+    }
+}
+// passsword :31Fa@ja#r
