@@ -1,0 +1,54 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Step 1: Get input values from user
+        Console.Write("Enter value for x: ");
+        string userX = Console.ReadLine();
+
+        Console.Write("Enter value for y: ");
+        string userY = Console.ReadLine();
+
+        Console.Write("Enter value for z: ");
+        string userZ = Console.ReadLine();
+
+        // Step 2: Build the custom input string
+        string input = $"x:{userX}; y:{userY}; z:{userZ}; result: x * y + z;";
+
+        // Step 3: Extract values using helper method
+        int x31 = ExtractValue(input, "x");  // using last two digits from student ID
+        int y = ExtractValue(input, "y");
+        int z = ExtractValue(input, "z");
+
+        // Step 4: Perform calculation
+        int result = x31 * y + z;
+
+        // Step 5: Display variables and result
+        Console.WriteLine($"\nx31 = {x31}");
+        Console.WriteLine($"y = {y}");
+        Console.WriteLine($"z = {z}");
+        Console.WriteLine($"Result = {result}");
+    }
+
+    // Helper function to extract value from formatted input string
+    static int ExtractValue(string input, string variable)
+    {
+        string[] parts = input.Split(';');
+        foreach (string part in parts)
+        {
+            string trimmed = part.Trim();
+            if (trimmed.StartsWith(variable + ":"))
+            {
+                string valuePart = trimmed.Substring(variable.Length + 1).Trim();
+                if (int.TryParse(valuePart, out int value))
+                {
+                    return value;
+                }
+            }
+        }
+        return 0; // default if not found
+    }
+}
+
