@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+class SymbolEntry
+{
+    public string VarName { get; set; }
+    public string VarType { get; set; }
+    public string VarValue { get; set; }
+    public int LineNumber { get; set; }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<SymbolEntry> symbolTable = new List<SymbolEntry>();
+        int lineNumber = 1;
+
+        Console.WriteLine("Enter variable declarations one by one (type 'exit' to stop):");
+
+        while (true)
+        {
+            Console.Write($"\nLine {lineNumber}: ");
+            string input = Console.ReadLine();
+
+            if (input.Trim().ToLower() == "exit")
+                break;
+
+            // Regex to match: type varName = value;
+            string pattern = @"(\w+)\s+(\w+)\s*=\s*([^;]+);";
+            Match match = Regex.Match(input, pattern);
+
+            if (match.Success)
+            {
+                string type = match.Groups[1].Value;
+                string name = match.Groups[2].Value;
+                string value = match.Groups[3].Value;
+
+                if (ContainsPalindrome(name))
+                {
+                    symbolTable.Add(new SymbolEntry
+                    {
+                        VarType = type,
+                        VarName = name,
+                        VarValue = value,
+                        LineNumber = lineNumber
+                    });
+                    Console.WriteLine("Inserted into symbol table.");
+                }
+                else
+                {
+                    Console.WriteLine(" Not inserted (no palindrome substring of length ≥ 3 in variable name).");
+                }
+            }
+            else
+            {
+                Console.WriteLine(" Invalid format. Try again like: int val33 = 999;");
+            }
+
+            lineNumber++;
+        }
+
+        // Display symbol table
+        Console.WriteLine(" Final Symbol Table:");
+        Console.WriteLine("-----------------------------------------------------");
+        Console.WriteLine($"{"Line",-6} {"Type",-10} {"VarName",-15} {"Value",-10}");
+        Console.WriteLine("-----------------------------------------------------");
+
+        foreach (var entry in symbolTable)
+        {
+            Console.WriteLine($"{entry.LineNumber,-6} {entry.VarType,-10} {entry.VarName,-15} {entry.VarValue,-10}");
+        }
+    }
+
+    // Custom palindrome checker
+    static bool ContainsPalindrome(string input)
+    {
+        for (int i = 0; i < input.Length; i++)
+        {
+            for (int j = i + 2; j < input.Length; j++) // length at least 3
+            {
+                string substr = input.Substring(i, j - i + 1);
+                if (IsPalindrome(substr))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if a given string is a palindrome
+    static bool IsPalindrome(string str)
+    {
+        int left = 0, right = str.Length - 1;
+        while (left < right)
+        {
+            if (str[left] != str[right])
+                return false;
+            left++;
+            right--;
+        }
+        return true;
+    }
+}
