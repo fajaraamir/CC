@@ -1,0 +1,118 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static Dictionary<string, List<string>> grammar = new Dictionary<string, List<string>>();
+    static Dictionary<string, HashSet<string>> firstSets = new Dictionary<string, HashSet<string>>();
+
+    static void Main()
+    {
+        Console.WriteLine("Enter grammar rules (e.g., E -> T X). Type 'end' to finish:");
+
+        // Step 1: Take grammar input from user
+        while (true)
+        {
+            Console.Write("> ");
+            string input = Console.ReadLine();
+            if (input.Trim().ToLower() == "end") break;
+
+            string[] parts = input.Split(new[] { "->" }, StringSplitOptions.None);
+            if (parts.Length != 2)
+            {
+                Console.WriteLine("Invalid rule. Format should be: A -> B C");
+                continue;
+            }
+
+            string lhs = parts[0].Trim();
+            string[] rhsParts = parts[1].Split('|');
+
+            foreach (string rhs in rhsParts)
+            {
+                string production = rhs.Trim();
+                if (!grammar.ContainsKey(lhs))
+                    grammar[lhs] = new List<string>();
+
+                grammar[lhs].Add(production);
+            }
+        }
+
+        // Step 2: Check for left recursion
+        foreach (var rule in grammar)
+        {
+            string nonTerminal = rule.Key;
+            foreach (string production in rule.Value)
+            {
+                if (production.StartsWith(nonTerminal))
+                {
+                    Console.WriteLine("Grammar invalid for top-down parsing. (Left recursion found)");
+                    return;
+                }
+            }
+        }
+
+        // Step 3: Check for ambiguity (multiple productions starting with same symbol)
+        foreach (var rule in grammar)
+        {
+            var starts = new HashSet<string>();
+            foreach (string prod in rule.Value)
+            {
+                string firstSymbol = prod.Split(' ').FirstOrDefault();
+                if (!string.IsNullOrEmpty(firstSymbol))
+                {
+                    if (starts.Contains(firstSymbol))
+                    {
+                        Console.WriteLine("Grammar invalid for top-down parsing. (Ambiguity found)");
+                        return;
+                    }
+                    starts.Add(firstSymbol);
+                }
+            }
+        }
+
+        // Step 4: Compute FIRST set only for E
+        if (!grammar.ContainsKey("E"))
+        {
+            Console.WriteLine("No rule found for E.");
+            return;
+        }
+
+        Console.WriteLine("\nComputing FIRST(E):");
+        var firstE = ComputeFirst("E");
+        Console.WriteLine("FIRST(E) = { " + string.Join(", ", firstE) + " }");
+    }
+
+    static HashSet<string> ComputeFirst(string symbol)
+    {
+        if (firstSets.ContainsKey(symbol))
+            return firstSets[symbol];
+
+        var result = new HashSet<string>();
+        if (!grammar.ContainsKey(symbol))
+        {
+            result.Add(symbol); // terminal
+            return result;
+        }
+
+        foreach (string production in grammar[symbol])
+        {
+            string[] symbols = production.Split(' ');
+
+            foreach (string s in symbols)
+            {
+                var firstS = ComputeFirst(s);
+                result.UnionWith(firstS.Where(t => t != "ε"));
+
+                if (!firstS.Contains("ε"))
+                    break;
+            }
+
+            if (symbols.All(s => ComputeFirst(s).Contains("ε")))
+                result.Add("ε");
+        }
+
+        firstSets[symbol] = result;
+        return result;
+    }
+}
